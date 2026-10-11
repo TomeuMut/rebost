@@ -68,6 +68,7 @@ Local data belongs to this browser profile and origin. Clearing site data or usi
 - `src/domain/pantry.ts`: pure inventory rules and sample data.
 - `src/domain/product-icons.ts`: available product icons and automatic suggestions.
 - `app/components/ProductIcon.vue`: Phosphor icons and a matching tomato SVG.
+- `app/components/LlenguesPattern.vue`: original vector decoration inspired by Mallorcan llengües textiles. Its blue, sage, terracotta, ochre, and linen colors use global `--color-textile-*` variables in `src/styles/global.css`.
 - `app/composables/usePantry.ts`: IndexedDB transactions, persistence, and tab updates.
 - `app/composables/useLanguage.ts`: language preference and localized page metadata.
 - `src/i18n/messages.ts`: Spanish, English, and Catalan interface messages.

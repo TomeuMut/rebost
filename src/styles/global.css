@@ -11,6 +11,11 @@
   --color-border: #e2e7df;
   --color-soft: #edf2e9;
   --color-danger: #a13d32;
+  --color-textile-primary: #315b86;
+  --color-textile-secondary: #62816c;
+  --color-textile-tertiary: #bd7964;
+  --color-textile-accent: #c0a36b;
+  --color-textile-background: #f4f0e5;
   --font-sans: "Segoe UI", Arial, sans-serif;
   --font-heading: Georgia, "Times New Roman", serif;
 }
@@ -204,6 +209,15 @@ form textarea { resize: vertical; }
 .icon-options button:hover { background: var(--color-soft); }
 .icon-picker .help-text { margin: .6rem 0 0; }
 .change-icon { margin-top: .9rem; }
+.llengues-pattern { display: block; pointer-events: none; }
+.page-heading { position: relative; isolation: isolate; overflow: hidden; }
+.page-heading > .llengues-pattern { position: absolute; z-index: -1; inset: 0 0 0 auto; width: 48%; height: 100%; opacity: .22; mask-image: linear-gradient(to right, transparent, black 80%); }
+.page-heading > div { position: relative; z-index: 1; }
+.page-heading > .button { position: relative; z-index: 1; }
+.sidebar-note { padding-top: 6.5rem; overflow: hidden; }
+.sidebar-note > .llengues-pattern { position: absolute; inset: 0 0 auto; width: 100%; height: 5rem; color: inherit; }
+@media (max-width:900px) { .page-heading > .llengues-pattern { width: 55%; opacity: .14; } }
+@media (max-width:600px) { .page-heading > .llengues-pattern { width: 100%; height: 4rem; top: auto; bottom: 0; opacity: .42; mask-image: linear-gradient(to bottom, transparent, black); } .page-heading { padding-bottom: 4.6rem; } }
 @media (max-width:600px) { .icon-options { grid-template-columns: repeat(4,minmax(0,1fr)); } .icon-options button span { font-size: .65rem; } .detail-summary { flex-wrap: wrap; gap: .7rem; } }
 @media (max-width:900px) { .side-nav { flex-wrap: wrap; justify-content: flex-end; } .zone-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width:600px) { .topbar { flex-wrap: wrap; gap: .5rem; } .topbar-tools { gap: .4rem; } .language-select select { font-size: .65rem; } .zone-grid { grid-template-columns: 1fr; } .zone-create fieldset { flex-direction: column; align-items: stretch; } .zone-create .button { justify-content: center; } .sidebar { align-items: flex-start; } .side-nav { max-width: 65%; } }
