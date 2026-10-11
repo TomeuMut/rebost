@@ -14,7 +14,7 @@ A small household pantry app for tracking preserves, ferments, and everyday food
 | Accounts and households | One local pantry, no sign-in | Supabase Auth and household memberships |
 | Hosting | Static output, ready for Vercel | Vercel web application with Supabase |
 
-This first version is a working local prototype, not the shared Supabase application yet. No external service has been provisioned, and there is no fake login or cloud synchronization. The interface is in Spanish. The initial wordmark is a placeholder; the final logo is pending.
+This first version is a working local prototype, not the shared Supabase application yet. No external service has been provisioned, and there is no fake login or cloud synchronization. The interface supports Spanish, English, and Catalan. The initial wordmark is a placeholder; the final logo is pending.
 
 ## Try it locally
 
@@ -47,6 +47,10 @@ The build generates static files in `.output/public`. `vercel.json` provides the
 - Search products and filter by category, location, or stock availability.
 - Browse and search the history of additions, consumption, and corrections.
 - Persist changes across page reloads and refresh other open tabs in the same browser.
+- Switch between ES, EN, and CA, with a saved language preference and localized dates, labels, and notices.
+- Create custom storage zones, such as Pantry 1 or Store room 2, from the Zones view or while adding a batch. Select them in batch forms and inventory filters.
+
+Product names, custom zone names, batch names, and personal notes stay as entered when changing language. The initial Pantry, Fridge, and Freezer zones have translated labels. Existing local inventories are migrated automatically to the zone model without deleting products, batches, or movement history. Adding a zone does not change stock quantities.
 
 Dates and notes are inventory information, not food-safety assessments. The app does not calculate safe-consumption periods.
 
@@ -62,15 +66,18 @@ Local data belongs to this browser profile and origin. Clearing site data or usi
 
 - `src/domain/pantry.ts`: pure inventory rules and sample data.
 - `app/composables/usePantry.ts`: IndexedDB transactions, persistence, and tab updates.
+- `app/composables/useLanguage.ts`: language preference and localized page metadata.
+- `src/i18n/messages.ts`: Spanish, English, and Catalan interface messages.
 - `app/app.vue`: inventory, product and batch dialogs, movement forms, and history.
 - `src/styles/global.css`: semantic theme variables, TailwindCSS, and responsive layout.
 - `tests/pantry.test.mjs`: stock integrity and validation tests.
+- `tests/zones.test.mjs` and `tests/languages.test.mjs`: custom zones, legacy migration, and translation coverage.
 
 ## Next phase
 
 Connect the same product/batch/movement model to Supabase. Add user accounts, household memberships, database migrations, row-level security policies, and server-side or PostgreSQL operations for atomic stock changes. All household access and any later photo storage must be authorized through membership; privileged keys must never reach the browser. Add tests for member/non-member access and concurrent inventory updates before enabling shared use.
 
-Photo uploads, multilingual UI, exports, reminders, QR labels, installability, and offline synchronization are future decisions. Recipe management, payments, and AI are outside the initial scope.
+Photo uploads, exports, reminders, QR labels, installability, and offline synchronization are future decisions. Recipe management, payments, and AI are outside the initial scope.
 
 ## Git Flow
 
