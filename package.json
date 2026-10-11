@@ -1,0 +1,32 @@
+{
+  "name": "rebost",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "nuxt dev --host 127.0.0.1 --port 3002",
+    "build": "nuxt generate",
+    "preview": "nuxt preview --host 127.0.0.1 --port 3002",
+    "check": "nuxt typecheck",
+    "postinstall": "nuxt prepare",
+    "test": "node --experimental-strip-types --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@phosphor-icons/vue": "^2.2.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "nuxt": "^4.5.2",
+    "tailwindcss": "^4.3.3",
+    "vue": "^3.5.43",
+    "vue-router": "^5.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vue-tsc": "^3.3.12"
+  },
+  "overrides": {
+    "@simple-git/argv-parser": "^2.0.1"
+  }
+}
