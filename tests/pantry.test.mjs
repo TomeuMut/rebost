@@ -1,0 +1,10 @@
+﻿import assert from 'node:assert/strict';
+import test from 'node:test';
+import { addProduct, addBatch, moveStock, productStock, stock, emptyPantry } from '../src/domain/pantry.ts';
+const product = s => addProduct(s, {name:'Tomate',category:'Conservas',unit:'botes'});
+const batch = (s,qty=5) => addBatch(s,s.products[0].id,{label:'Septiembre',location:'Despensa',date:'2026-09-01',notes:'',quantity:qty});
+test('separate batches contribute to totals without losing their balances',()=>{ let s=batch(product(emptyPantry()));s=batch(s,3);const old=s;s=moveStock(s,s.batches[0].id,'consumo',1,'Comida');assert.equal(productStock(s,s.products[0].id),7);assert.equal(stock(s,s.batches[0].id),4);assert.equal(stock(s,s.batches[1].id),3);assert.equal(productStock(old,old.products[0].id),8); });
+test('reject overspending, fractional quantities and duplicate products',()=>{const s=batch(product(emptyPantry()));assert.throws(()=>moveStock(s,s.batches[0].id,'consumo',6,''));assert.throws(()=>moveStock(s,s.batches[0].id,'entrada',1.5,''));assert.throws(()=>product(s));assert.equal(stock(s,s.batches[0].id),5);});
+test('corrections require a reason and record a delta, including zero balance',()=>{let s=batch(product(emptyPantry()));assert.throws(()=>moveStock(s,s.batches[0].id,'ajuste',3,''));s=moveStock(s,s.batches[0].id,'ajuste',0,'Recuento manual');assert.equal(stock(s,s.batches[0].id),0);assert.equal(s.movements[0].delta,-5);assert.equal(s.movements[0].type,'ajuste');assert.throws(()=>moveStock(s,s.batches[0].id,'ajuste',0,'Sin cambio'));});
+test('invalid dates and orphan batches cannot enter the pantry',()=>{const s=product(emptyPantry());assert.throws(()=>addBatch(s,s.products[0].id,{label:'',location:'Despensa',date:'2026-02-30',notes:'',quantity:1}));assert.throws(()=>addBatch(s,'missing',{label:'',location:'Despensa',date:'',notes:'',quantity:1}));});
+test('a repeated consumption against the latest balance cannot overspend',()=>{let s=batch(product(emptyPantry()),1);const id=s.batches[0].id;s=moveStock(s,id,'consumo',1,'');assert.throws(()=>moveStock(s,id,'consumo',1,''));assert.equal(stock(s,id),0);});
