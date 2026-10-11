@@ -195,5 +195,15 @@ form textarea { resize: vertical; }
 .zone-card p { font-size: .75rem; color: var(--color-muted); margin-top: .5rem; }
 .inline-zone-toggle { margin-bottom: 1rem; }
 .inline-zone { padding: 1rem; border: 1px solid var(--color-border); border-radius: 8px; margin-bottom: 1rem; }
+.icon-picker { min-width: 0; margin: 0 0 1.2rem; padding: 0; border: 0; }
+.icon-picker legend { font-size: .8rem; font-weight: 600; margin-bottom: .65rem; }
+.icon-options { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: .4rem; }
+.icon-options button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; padding: .65rem .2rem; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-muted); border-radius: 8px; min-width: 0; }
+.icon-options button span { font-size: .55rem; overflow-wrap: anywhere; }
+.icon-options button[aria-pressed="true"] { border-color: var(--color-primary); background: var(--color-soft); color: var(--color-primary); box-shadow: inset 0 0 0 1px var(--color-primary); }
+.icon-options button:hover { background: var(--color-soft); }
+.icon-picker .help-text { margin: .6rem 0 0; }
+.change-icon { margin-top: .9rem; }
+@media (max-width:600px) { .icon-options { grid-template-columns: repeat(4,minmax(0,1fr)); } .icon-options button span { font-size: .65rem; } .detail-summary { flex-wrap: wrap; gap: .7rem; } }
 @media (max-width:900px) { .side-nav { flex-wrap: wrap; justify-content: flex-end; } .zone-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width:600px) { .topbar { flex-wrap: wrap; gap: .5rem; } .topbar-tools { gap: .4rem; } .language-select select { font-size: .65rem; } .zone-grid { grid-template-columns: 1fr; } .zone-create fieldset { flex-direction: column; align-items: stretch; } .zone-create .button { justify-content: center; } .sidebar { align-items: flex-start; } .side-nav { max-width: 65%; } }
