@@ -1,14 +1,29 @@
-﻿export type Unit = 'botes' | 'botellas' | 'bolsas' | 'unidades';
+export type Unit = 'botes' | 'botellas' | 'bolsas' | 'unidades';
 export type Category = 'Conservas' | 'Fermentados' | 'Secos' | 'Otros';
-export type Location = 'Despensa' | 'Nevera' | 'Congelador';
+export type Location = string;
+export interface Zone { id: string; name: string; system?: 'Despensa' | 'Nevera' | 'Congelador' }
 export interface Product { id: string; name: string; category: Category; unit: Unit; createdAt: string }
-export interface Batch { id: string; productId: string; label: string; location: Location; date: string; notes: string; createdAt: string }
-export interface Movement { id: string; batchId: string; delta: number; type: 'entrada' | 'consumo' | 'ajuste'; note: string; createdAt: string }
-export interface Pantry { version: 1; products: Product[]; batches: Batch[]; movements: Movement[]; demo: boolean }
+export interface Batch { id: string; productId: string; label: string; defaultLabel?: boolean; location: Location; date: string; notes: string; createdAt: string }
+export interface Movement { id: string; batchId: string; delta: number; type: 'entrada' | 'consumo' | 'ajuste'; note: string; systemNote?: 'batchAdded'; createdAt: string }
+export interface Pantry { version: 2; zones: Zone[]; products: Product[]; batches: Batch[]; movements: Movement[]; demo: boolean }
 export const categories: Category[] = ['Conservas', 'Fermentados', 'Secos', 'Otros'];
 export const units: Unit[] = ['botes', 'botellas', 'bolsas', 'unidades'];
 export const locations: Location[] = ['Despensa', 'Nevera', 'Congelador'];
-export const emptyPantry = (): Pantry => ({ version: 1, products: [], batches: [], movements: [], demo: false });
+export const emptyPantry = (): Pantry => ({ version: 2, products: [], batches: [], movements: [], demo: false, zones: locations.map(name => ({ id: name, name, system: name as Zone['system'] })) });
+type LegacyPantry = Omit<Pantry, 'version' | 'zones'> & { version: 1 };
+export function migratePantry(state: Pantry | LegacyPantry): Pantry {
+  if (state.version === 2) return state;
+  const zones = emptyPantry().zones;
+  for (const batch of state.batches) if (!zones.some(zone => zone.id === batch.location)) zones.push({ id: batch.location, name: batch.location });
+  return { ...state, version: 2, zones, movements: state.movements.map(movement => movement.type === 'entrada' && movement.note === 'Lote añadido' && state.movements.findLast(item => item.batchId === movement.batchId)?.id === movement.id ? { ...movement, systemNote: 'batchAdded' as const } : movement) };
+}
+export function addZone(state: Pantry, input: string): Pantry {
+  const name = input.trim();
+  const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es');
+  if (!name || name.length > 80) throw new Error('Indica un nombre de zona de entre 1 y 80 caracteres.');
+  if (state.zones.some(zone => normalize(zone.name) === normalize(name))) throw new Error('Ya existe una zona con ese nombre.');
+  return { ...state, zones: [...state.zones, { id: crypto.randomUUID(), name }] };
+}
 export const stock = (state: Pantry, batchId: string): number => state.movements.filter(m => m.batchId === batchId).reduce((sum, m) => sum + m.delta, 0);
 export const productStock = (state: Pantry, productId: string): number => state.batches.filter(b => b.productId === productId).reduce((sum, b) => sum + stock(state, b.id), 0);
 function clean(value: string, max: number): string { return value.trim().slice(0, max); }
@@ -24,10 +39,10 @@ export function addProduct(state: Pantry, input: { name: string; category: Categ
 export function addBatch(state: Pantry, productId: string, input: { label: string; location: Location; date: string; notes: string; quantity: number }): Pantry {
   if (!state.products.some(p => p.id === productId)) throw new Error('El producto ya no existe.');
   quantity(input.quantity);
-  if (!locations.includes(input.location)) throw new Error('Elige una ubicación válida.');
+  if (!state.zones.some(zone => zone.id === input.location)) throw new Error('Elige una ubicación válida.');
   if (input.date && (!/^\d{4}-\d{2}-\d{2}$/.test(input.date) || Number.isNaN(Date.parse(input.date)) || new Date(input.date).toISOString().slice(0, 10) !== input.date)) throw new Error('Revisa la fecha de elaboración.');
-  const batch: Batch = { id: crypto.randomUUID(), productId, label: clean(input.label, 80) || 'Lote ' + (state.batches.filter(b => b.productId === productId).length + 1), location: input.location, date: input.date, notes: clean(input.notes, 400), createdAt: timestamp() };
-  const movement: Movement = { id: crypto.randomUUID(), batchId: batch.id, delta: input.quantity, type: 'entrada', note: 'Lote añadido', createdAt: timestamp() };
+  const batch: Batch = { id: crypto.randomUUID(), productId, label: clean(input.label, 80) || 'Lote ' + (state.batches.filter(b => b.productId === productId).length + 1), defaultLabel: !clean(input.label, 80), location: input.location, date: input.date, notes: clean(input.notes, 400), createdAt: timestamp() };
+  const movement: Movement = { id: crypto.randomUUID(), batchId: batch.id, delta: input.quantity, type: 'entrada', note: 'Lote añadido', systemNote: 'batchAdded', createdAt: timestamp() };
   return { ...state, batches: [...state.batches, batch], movements: [movement, ...state.movements] };
 }
 export function moveStock(state: Pantry, batchId: string, type: 'entrada' | 'consumo' | 'ajuste', amount: number, note: string): Pantry {
