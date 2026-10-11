@@ -1,8 +1,9 @@
+import { productIcons, type ProductIconId } from './product-icons.ts';
 export type Unit = 'botes' | 'botellas' | 'bolsas' | 'unidades';
 export type Category = 'Conservas' | 'Fermentados' | 'Secos' | 'Otros';
 export type Location = string;
 export interface Zone { id: string; name: string; system?: 'Despensa' | 'Nevera' | 'Congelador' }
-export interface Product { id: string; name: string; category: Category; unit: Unit; createdAt: string }
+export interface Product { id: string; name: string; category: Category; unit: Unit; icon?: ProductIconId; createdAt: string }
 export interface Batch { id: string; productId: string; label: string; defaultLabel?: boolean; location: Location; date: string; notes: string; createdAt: string }
 export interface Movement { id: string; batchId: string; delta: number; type: 'entrada' | 'consumo' | 'ajuste'; note: string; systemNote?: 'batchAdded'; createdAt: string }
 export interface Pantry { version: 2; zones: Zone[]; products: Product[]; batches: Batch[]; movements: Movement[]; demo: boolean }
@@ -29,12 +30,18 @@ export const productStock = (state: Pantry, productId: string): number => state.
 function clean(value: string, max: number): string { return value.trim().slice(0, max); }
 function quantity(value: number, allowZero = false): void { if (!Number.isSafeInteger(value) || value < (allowZero ? 0 : 1) || value > 1_000_000) throw new Error('Introduce una cantidad entera entre ' + (allowZero ? '0' : '1') + ' y 1.000.000.'); }
 const timestamp = () => new Date().toISOString();
-export function addProduct(state: Pantry, input: { name: string; category: Category; unit: Unit }): Pantry {
+export function addProduct(state: Pantry, input: { name: string; category: Category; unit: Unit; icon?: ProductIconId }): Pantry {
   const name = clean(input.name, 80);
   if (!name) throw new Error('El producto necesita un nombre.');
   if (!categories.includes(input.category) || !units.includes(input.unit)) throw new Error('Revisa la categoría y la unidad.');
   if (state.products.some(p => p.name.toLocaleLowerCase('es') === name.toLocaleLowerCase('es'))) throw new Error('Ya tienes un producto con ese nombre. Añade un lote al existente.');
-  return { ...state, products: [...state.products, { id: crypto.randomUUID(), name, category: input.category, unit: input.unit, createdAt: timestamp() }] };
+  if (input.icon && !productIcons.includes(input.icon)) throw new Error('Elige un icono válido.');
+  return { ...state, products: [...state.products, { id: crypto.randomUUID(), name, category: input.category, unit: input.unit, icon: input.icon || 'auto', createdAt: timestamp() }] };
+}
+export function setProductIcon(state: Pantry, productId: string, icon: ProductIconId): Pantry {
+  if (!state.products.some(product => product.id === productId)) throw new Error('El producto ya no existe.');
+  if (!productIcons.includes(icon)) throw new Error('Elige un icono válido.');
+  return { ...state, products: state.products.map(product => product.id === productId ? { ...product, icon } : product) };
 }
 export function addBatch(state: Pantry, productId: string, input: { label: string; location: Location; date: string; notes: string; quantity: number }): Pantry {
   if (!state.products.some(p => p.id === productId)) throw new Error('El producto ya no existe.');

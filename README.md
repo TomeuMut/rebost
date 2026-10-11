@@ -39,6 +39,7 @@ The build generates static files in `.output/public`. `vercel.json` provides the
 ## Available features
 
 - Create products with a category and stock unit: jars, bottles, bags, or units.
+- Choose product icons for containers and foods, including jars, bottles, tomatoes, vegetables, fruit, grains, and herbs. Automatic mode suggests an icon from the product name or unit; existing products work without a data migration. Change a saved product's icon from its detail view.
 - Start with zero stock or create the first batch in the same transaction as the product.
 - Add separate batches with a name, location, optional preparation date, and notes.
 - Add stock to an existing batch or record consumption.
@@ -65,6 +66,8 @@ Local data belongs to this browser profile and origin. Clearing site data or usi
 ## Source map
 
 - `src/domain/pantry.ts`: pure inventory rules and sample data.
+- `src/domain/product-icons.ts`: available product icons and automatic suggestions.
+- `app/components/ProductIcon.vue`: Phosphor icons and a matching tomato SVG.
 - `app/composables/usePantry.ts`: IndexedDB transactions, persistence, and tab updates.
 - `app/composables/useLanguage.ts`: language preference and localized page metadata.
 - `src/i18n/messages.ts`: Spanish, English, and Catalan interface messages.
