@@ -1,4 +1,4 @@
-﻿import { emptyPantry, type Pantry } from '../../src/domain/pantry';
+import { emptyPantry, migratePantry, type Pantry } from '../../src/domain/pantry';
 
 const state = ref<Pantry>(emptyPantry());
 const ready = ref(false);
@@ -14,7 +14,7 @@ export function usePantry() {
     const tx = database.transaction('pantry', 'readonly');
     const request = tx.objectStore('pantry').get('home');
     await new Promise<void>(resolve => {
-      request.onsuccess = () => { if (request.result) state.value = request.result as Pantry; resolve(); };
+      request.onsuccess = () => { if (request.result) state.value = migratePantry(request.result); resolve(); };
       request.onerror = () => { error.value = 'No se ha podido leer tu despensa. Recarga la página para volver a intentarlo.'; resolve(); };
     });
   }
@@ -33,7 +33,7 @@ export function usePantry() {
         const tx = database!.transaction('pantry', 'readwrite');
         const store = tx.objectStore('pantry');
         const get = store.get('home');
-        get.onsuccess = () => { if (!get.result) store.put(emptyPantry(), 'home'); };
+        get.onsuccess = () => { store.put(get.result ? migratePantry(get.result) : emptyPantry(), 'home'); };
         tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error);
       }).then(async () => { await reload(); ready.value = true; }).catch(() => { error.value = 'No se ha podido preparar tu despensa. Recarga para volver a intentarlo.'; });
       if ('BroadcastChannel' in window) { channel = new BroadcastChannel('rebost-updates'); channel.onmessage = () => { void reload(); }; }
@@ -47,7 +47,7 @@ export function usePantry() {
       await new Promise<void>((resolve, reject) => {
         const tx = database!.transaction('pantry', 'readwrite');
         const store = tx.objectStore('pantry'); const get = store.get('home'); let next: Pantry;
-        get.onsuccess = () => { try { next = change(get.result as Pantry); store.put(JSON.parse(JSON.stringify(next)), 'home'); } catch (err) { tx.abort(); reject(err); } };
+        get.onsuccess = () => { try { next = change(migratePantry(get.result)); store.put(JSON.parse(JSON.stringify(next)), 'home'); } catch (err) { tx.abort(); reject(err); } };
         tx.oncomplete = () => { state.value = next; channel?.postMessage('updated'); resolve(); };
         tx.onabort = () => reject(new Error('No se han guardado los cambios. El almacenamiento puede estar lleno o no disponible.'));
         tx.onerror = () => reject(tx.error);
