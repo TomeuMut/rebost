@@ -1,4 +1,6 @@
-﻿# Rebost
+# Rebost
+
+Current release: **v0.1.0**, the local pantry baseline. See [release notes](docs/releases/0.1.0.md) for scope, validation and the planned Supabase phase.
 
 A small household pantry app for tracking preserves, ferments, and everyday food reserves. Know what you have, how much is left, and where it is stored.
 
@@ -85,6 +87,6 @@ Photo uploads, exports, reminders, QR labels, installability, and offline synchr
 
 ## Git Flow
 
-Use `main` for production, `develop` for integration, and `feature/*` branches from `develop` for changes reviewed through pull requests. Prepare releases in `release/*`, use annotated SemVer tags, and synchronize releases back into `develop`. Urgent production fixes start in `hotfix/*`. Rebase only private working history.
+Use `main` for production, `develop` for integration, and `feature/*` branches from `develop` for changes integrated through local `git merge --no-ff` and SSH pushes. Pull requests are optional unless explicitly requested or required by branch protection. Prepare releases in `release/*`, use annotated SemVer tags, and synchronize releases back into `develop`. Urgent production fixes start in `hotfix/*`. Rebase only private working history.
 
 Commit messages and README content are in English. Pushes, merges, tags, service provisioning, and deployment require explicit authorization. Repository agreements are in `AGENTS.md`.
