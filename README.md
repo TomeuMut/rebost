@@ -90,3 +90,7 @@ Photo uploads, exports, reminders, QR labels, installability, and offline synchr
 Use `main` for production, `develop` for integration, and `feature/*` branches from `develop` for changes integrated through local `git merge --no-ff` and SSH pushes. Pull requests are optional unless explicitly requested or required by branch protection. Prepare releases in `release/*`, use annotated SemVer tags, and synchronize releases back into `develop`. Urgent production fixes start in `hotfix/*`. Rebase only private working history.
 
 Commit messages and README content are in English. Pushes, merges, tags, service provisioning, and deployment require explicit authorization. Repository agreements are in `AGENTS.md`.
+
+## CI/CD
+
+GitHub Actions runs lint, type checks, unit tests, production build and desktop/mobile browser smoke tests. Vercel handles deployments through its Git integration. See [CI/CD setup and local commands](docs/ci-cd.md) for coverage, reports and the separate deployment-gating configuration.
